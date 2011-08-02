@@ -1,0 +1,21 @@
+CREATE TABLE `books` (
+	`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+	`name` VARCHAR(255) NOT NULL,
+	`description` VARCHAR(255) NOT NULL DEFAULT ''
+) engine=InnoDB;
+
+CREATE TABLE `chapters` (
+	`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+	`book_id` INT UNSIGNED NOT NULL,
+	`chapter` INT UNSIGNED NOT NULL,
+
+	FOREIGN KEY (`book_id`) REFERENCES books(`id`)
+) engine=InnoDB;
+
+CREATE TABLE `verses` (
+	`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+	`chapter_id` INT UNSIGNED NOT NULL,
+	`text` TEXT NOT NULL,
+
+	FOREIGN KEY (`chapter_id`) REFERENCES chapters(`id`)
+) engine=InnoDB;
