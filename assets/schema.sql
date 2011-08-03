@@ -13,6 +13,7 @@ CREATE TABLE `chapters` (
 CREATE TABLE `verses` (
 	`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 	`chapter_id` INT UNSIGNED NOT NULL,
+	`number` INT UNSIGNED NOT NULL,
 	`text` TEXT NOT NULL,
 
 	FULLTEXT (`text`)

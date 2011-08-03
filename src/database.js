@@ -7,6 +7,10 @@ function Database(user, password, database) {
 		
 		insertChapter: this.connection.prepare(
 			'INSERT INTO `chapters` (`book_id`, `chapter`) VALUES(?, ?)'
+		),
+
+		insertVerse: this.connection.prepare(
+			'INSERT INTO `verses` (`chapter_id`, `number`, `text`) VALUES(?, ?, ?)'
 		)
 	};
 }
@@ -42,9 +46,13 @@ Database.prototype.addChapter = function (bookId, chapterNumber) {
 * @param {number} chapterId The ID of the chapter in the database
 * @param {number} verseNumber The number of the verse in the chapter
 * @param {string} verse The text content of the verse
-* @return {number} The generated ID of the verse in the database
+* @return {number} The generated ID of the verse in the database, or -1 if no ID was generated
 */
 Database.prototype.addVerse = function (chapterId, verseNumber, verse) {
-	print('Adding verse: (' + verseNumber + ') ' + verse);
-	return 0;
+	var verseId = this.connection.execute(this.statements.insertVerse, [chapterId, verseNumber, verse]);
+	if (verseId.length) {
+		return verseId[0];
+	}
+
+	return -1;
 };
