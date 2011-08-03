@@ -16,7 +16,7 @@ Parser.modes = {
 
 Parser.patterns = {
 	chapter: /^CHAPTER\s+(\d+)$/,
-	verse: /^(\d+)\s+\w/
+	verse: /^(\d+)\s+(.+)$/
 };
 
 /** Parse a stream of bible data
@@ -45,11 +45,27 @@ Parser.prototype.parseChapter = function (line) {
 	return -1;
 };
 
+/** Parse a verse line
+* @param {string} line The line to parse
+* @return {object} An object containing the number and text content of the verse, or null if line is not a verse
+*/
+Parser.prototype.parseVerse = function (line) {
+	var match = line.match(Parser.patterns.verse);
+	if (match !== null) {
+		return ({
+			number: match[1],
+			text: match[2]
+		});
+	}
+
+	return null;
+};
+
 /** Parse an indvidual line
 * @param {string} line The line to parse
 */
 Parser.prototype.parseLine = function (line) {
-	var temp;
+	var verse;
 
 	if (this.lastLine !== null && this.lastLine.length === 0) {
 		this.mode = Parser.modes.book;
@@ -67,8 +83,10 @@ Parser.prototype.parseLine = function (line) {
 	if (this.mode === Parser.modes.book) {
 		this.book = this.db.addBook(line);
 	} else if (this.mode === Parser.modes.chapter) {
-		this.chapter = this.parseChapter(line);
-		this.db.addChapter(this.book, this.chapter);
+		this.chapter = this.db.addChapter(this.book, this.parseChapter(line));
 		this.mode = Parser.modes.verse;
+	} else if (this.mode === Parser.modes.verse) {
+		verse = this.parseVerse(line);
+		this.db.addVerse(this.chapter, verse.number, verse.text);
 	}
 };
