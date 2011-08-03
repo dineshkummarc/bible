@@ -1,15 +1,23 @@
-function Database() {
-	this.book = 0;
+function Database(user, password, database) {
+	this.connection = MySQL.open(user, password, database);
+	this.statements = {
+		insertBook: this.connection.prepare(
+			'INSERT INTO `books` (`name`) VALUES(?)'
+		)
+	};
 }
 
 /* Add a book to the database
 * @param {string} bookName The name of the book
-* @return {number} The generated ID of the book in the database
+* @return {number} The generated ID of the book in the database, or -1 if no ID was generated
 */
 Database.prototype.addBook = function (bookName) {
-	print('Adding book: ' + bookName)
-	this.book += 1;
-	return this.book;
+	var bookId = this.connection.execute(this.statements.insertBook, [bookName]);
+	if (bookId.length) {
+		return bookId[0];
+	}
+
+	return -1;
 };
 
 /* Add a chapter to the database
