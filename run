@@ -1,0 +1,1 @@
+java -cp .:lib/js.jar:lib/mysql.jar org.mozilla.javascript.tools.shell.Main src/parse.js
