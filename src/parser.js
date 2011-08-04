@@ -16,7 +16,8 @@ Parser.modes = {
 
 Parser.patterns = {
 	chapter: /^CHAPTER\s+(\d+)$/,
-	verse: /^(\d+)\s+(.+)$/
+	verse: /^(\d+)\s+(.+)$/,
+	words: /\b[\w'-]+\b/g
 };
 
 /** Parse a stream of bible data
@@ -61,11 +62,21 @@ Parser.prototype.parseVerse = function (line) {
 	return null;
 };
 
+/** Extract words from a verse and store them in the database word index
+* @param {number} verseId The verseId in the database to associate with the words
+* @param {string} verse The verse to parse
+*/
+Parser.prototype.parseWords = function (verseId, verse) {
+	verse.toLowerCase().match(Parser.patterns.words).forEach(function (word) {
+		this.db.addWord(verseId, word);
+	});
+};
+
 /** Parse an indvidual line
 * @param {string} line The line to parse
 */
 Parser.prototype.parseLine = function (line) {
-	var verse;
+	var verse, verseId;
 
 	if (this.lastLine !== null && this.lastLine.length === 0) {
 		this.mode = Parser.modes.book;
@@ -87,6 +98,7 @@ Parser.prototype.parseLine = function (line) {
 		this.mode = Parser.modes.verse;
 	} else if (this.mode === Parser.modes.verse) {
 		verse = this.parseVerse(line);
-		this.db.addVerse(this.chapter, verse.number, verse.text);
+		verseId = this.db.addVerse(this.chapter, verse.number, verse.text);
+		this.parseWords(verseId, verse.text);
 	}
 };

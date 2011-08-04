@@ -18,3 +18,9 @@ CREATE TABLE `verses` (
 
 	FULLTEXT (`text`)
 );
+
+CREATE TABLE `words` (
+	`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+	`verse_id` INT UNSIGNED NOT NULL,
+	`word` VARCHAR(255) NOT NULL
+);

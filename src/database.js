@@ -11,6 +11,10 @@ function Database(user, password, database) {
 
 		insertVerse: this.connection.prepare(
 			'INSERT INTO `verses` (`chapter_id`, `number`, `text`) VALUES(?, ?, ?)'
+		),
+
+		insertWord: this.connection.prepare(
+			'INSERT INTO `words` (`verse_id`, `word`) VALUES(?, ?)'
 		)
 	};
 }
@@ -52,6 +56,20 @@ Database.prototype.addVerse = function (chapterId, verseNumber, verse) {
 	var verseId = this.connection.execute(this.statements.insertVerse, [chapterId, verseNumber, verse]);
 	if (verseId.length) {
 		return verseId[0];
+	}
+
+	return -1;
+};
+
+/* Add a word to the database
+* @param {number} verseId The ID of the verse this word was found
+* @param {string} word The word to add into the word index
+* @return {number} The generated ID of the word in the database, or -1 if no ID was generated
+*/
+Database.prototype.addWord = function (verseId, word) {
+	var wordId = this.connection.execute(this.statements.insertWord, [verseId, word]);
+	if (wordId.length) {
+		return wordId[0];
 	}
 
 	return -1;
